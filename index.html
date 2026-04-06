@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multi-Agent Behavior Tree Visualization</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f3;
+      color: #2c2c2a;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a18; color: #c2c0b6; }
+      .tree-card, .timeline-card, .controls { background: #2c2c2a; border-color: #444441; }
+      .section-label { color: #888780; }
+      .subtitle { color: #888780; }
+      button { background: #3a3a38; border-color: #555553; color: #c2c0b6; }
+      button:hover { background: #4a4a48; }
+    }
+
+    h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #5F5E5A; margin-bottom: 20px; }
+
+    .section-label {
+      font-size: 11px; font-weight: 500; color: #5F5E5A;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
+    }
+
+    /* ── Trees ── */
+    .trees-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 16px;
+    }
+    @media (max-width: 600px) { .trees-row { grid-template-columns: 1fr; } }
+
+    .tree-card {
+      background: #fff; border: 0.5px solid #d3d1c7;
+      border-radius: 12px; padding: 14px;
+    }
+    .tree-title {
+      font-weight: 500; font-size: 13px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .agent-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .dot-a { background: #1D9E75; }
+    .dot-b { background: #534AB7; }
+
+    /* ── Timeline ── */
+    .timeline-card {
+      background: #fff; border: 0.5px solid #d3d1c7;
+      border-radius: 12px; padding: 14px; margin-bottom: 12px;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      background: #fff; border: 0.5px solid #d3d1c7;
+      border-radius: 12px; padding: 14px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .controls label { font-size: 12px; color: #5F5E5A; white-space: nowrap; }
+    input[type=range] { flex: 1; min-width: 120px; accent-color: #EF9F27; }
+    .tick-display {
+      font-size: 13px; font-weight: 500; color: #BA7517;
+      min-width: 50px; white-space: nowrap;
+    }
+    button {
+      font-size: 12px; padding: 5px 14px; border-radius: 6px;
+      border: 0.5px solid #b4b2a9; background: #f5f5f3;
+      color: #2c2c2a; cursor: pointer; white-space: nowrap;
+    }
+    button:hover { background: #e8e7e3; }
+
+    /* ── Legend ── */
+    .legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #5F5E5A; }
+    .legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+    .legend-dash { width: 16px; height: 2px; background: #EF9F27; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+  <h1>Multi-Agent Behavior Tree Visualization</h1>
+  <p class="subtitle">Real-time hierarchical execution dynamics — Georgia Institute of Technology</p>
+
+  <div class="section-label">Behavior trees</div>
+  <div class="trees-row">
+    <div class="tree-card">
+      <div class="tree-title">
+        <span class="agent-dot dot-a"></span>Agent A — Patrol &amp; Attack
+      </div>
+      <svg id="treeA" width="100%" viewBox="0 0 300 260"></svg>
+    </div>
+    <div class="tree-card">
+      <div class="tree-title">
+        <span class="agent-dot dot-b"></span>Agent B — Guard &amp; Retreat
+      </div>
+      <svg id="treeB" width="100%" viewBox="0 0 300 260"></svg>
+    </div>
+  </div>
+
+  <div class="section-label">Execution timeline</div>
+  <div class="timeline-card">
+    <svg id="timeline" width="100%" viewBox="0 0 680 220"></svg>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#1D9E75;opacity:.85"></div>Agent A active
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#534AB7;opacity:.85"></div>Agent B active
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#E24B4A;opacity:.85"></div>Failure
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#888780"></div>Idle / not active
+      </div>
+      <div class="legend-item">
+        <div class="legend-dash"></div>Current tick
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label>Tick</label>
+    <input type="range" id="tickSlider" min="0" max="19" value="0" step="1"
+      oninput="onSlider(this.value)">
+    <span class="tick-display" id="tickDisplay">tick 0</span>
+    <button id="playBtn" onclick="togglePlay()">⏸ Pause</button>
+  </div>
+
+  <!-- ── Load mock data first, then the main app ── -->
+  <script src="mockData.js"></script>
+  <script src="main.js"></script>
+
+</body>
+</html>
