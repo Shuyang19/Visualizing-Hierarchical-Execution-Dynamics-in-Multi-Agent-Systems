@@ -48,7 +48,7 @@ const AGENT_DEFINITIONS = [
   {
     key: 'ghost-red',
     title: 'Ghost Red',
-    subtitle: 'Patrol / Chase / Eaten / Cooldown',
+    subtitle: 'Patrol / Chase / Eat / Cooldown',
     dotClass: 'dot-red',
     accent: '#E24B4A',
     tree: {
@@ -61,8 +61,8 @@ const AGENT_DEFINITIONS = [
           label: 'Sequence',
           type: 'sequence',
           children: [
-            { id: 'cond_eaten_red', label: 'Was eaten?', type: 'condition', children: [] },
-            { id: 'act_eaten_red', label: 'Eaten', type: 'action', children: [] }
+            { id: 'cond_eaten_red', label: 'Caught Pac-man?', type: 'condition', children: [] },
+            { id: 'act_eaten_red', label: 'Eat', type: 'action', children: [] }
           ]
         },
         {
@@ -97,7 +97,7 @@ const AGENT_DEFINITIONS = [
   {
     key: 'ghost-pink',
     title: 'Ghost Pink',
-    subtitle: 'Patrol / Chase / Eaten / Cooldown',
+    subtitle: 'Patrol / Chase / Eat / Cooldown',
     dotClass: 'dot-pink',
     accent: '#F08BC1',
     tree: {
@@ -110,8 +110,8 @@ const AGENT_DEFINITIONS = [
           label: 'Sequence',
           type: 'sequence',
           children: [
-            { id: 'cond_eaten_pink', label: 'Was eaten?', type: 'condition', children: [] },
-            { id: 'act_eaten_pink', label: 'Eaten', type: 'action', children: [] }
+            { id: 'cond_eaten_pink', label: 'Caught Pac-man?', type: 'condition', children: [] },
+            { id: 'act_eaten_pink', label: 'Eat', type: 'action', children: [] }
           ]
         },
         {
@@ -146,7 +146,7 @@ const AGENT_DEFINITIONS = [
   {
     key: 'ghost-green',
     title: 'Ghost Green',
-    subtitle: 'Patrol / Chase / Eaten / Cooldown',
+    subtitle: 'Patrol / Chase / Eat / Cooldown',
     dotClass: 'dot-green',
     accent: '#41B66E',
     tree: {
@@ -159,8 +159,8 @@ const AGENT_DEFINITIONS = [
           label: 'Sequence',
           type: 'sequence',
           children: [
-            { id: 'cond_eaten_green', label: 'Was eaten?', type: 'condition', children: [] },
-            { id: 'act_eaten_green', label: 'Eaten', type: 'action', children: [] }
+            { id: 'cond_eaten_green', label: 'Caught Pac-man?', type: 'condition', children: [] },
+            { id: 'act_eaten_green', label: 'Eat', type: 'action', children: [] }
           ]
         },
         {
@@ -195,7 +195,7 @@ const AGENT_DEFINITIONS = [
   {
     key: 'ghost-blue',
     title: 'Ghost Blue',
-    subtitle: 'Patrol / Chase / Eaten / Cooldown',
+    subtitle: 'Patrol / Chase / Eat / Cooldown',
     dotClass: 'dot-blue',
     accent: '#4A90E2',
     tree: {
@@ -208,8 +208,8 @@ const AGENT_DEFINITIONS = [
           label: 'Sequence',
           type: 'sequence',
           children: [
-            { id: 'cond_eaten_blue', label: 'Was eaten?', type: 'condition', children: [] },
-            { id: 'act_eaten_blue', label: 'Eaten', type: 'action', children: [] }
+            { id: 'cond_eaten_blue', label: 'Caught Pac-man?', type: 'condition', children: [] },
+            { id: 'act_eaten_blue', label: 'Eat', type: 'action', children: [] }
           ]
         },
         {
