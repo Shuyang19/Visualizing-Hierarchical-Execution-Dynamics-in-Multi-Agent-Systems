@@ -273,7 +273,9 @@ function drawTimeline(agent, svgEl, statusMap) {
   const ns = 'http://www.w3.org/2000/svg';
   const PAD_L = 84;
   const PAD_R = 12;
-  const PAD_T = 20;
+  const PAD_T = 28;
+  const TITLE_Y = 12;
+  const TICK_Y = PAD_T + 9;
   const ROW_H = 18;
   const GAP = 6;
   const SVG_W = 680;
@@ -292,11 +294,11 @@ function drawTimeline(agent, svgEl, statusMap) {
     svgEl.appendChild(t);
   }
 
-  addText(PAD_L, PAD_T + 10, agent.title, 10, agent.header);
+  addText(PAD_L, TITLE_Y, agent.title, 10, agent.header);
 
   for (let t = 0; t < TICK_COUNT; t += 2) {
     const x = PAD_L + t * cellW + cellW / 2;
-    addText(x, PAD_T + 9, 't' + t, 9, null, 'middle');
+    addText(x, TICK_Y, 't' + t, 9, null, 'middle');
   }
 
   agent.rows.forEach((nodeId, index) => {
@@ -393,13 +395,19 @@ function render() {
   buildLegend();
   buildAgentRows();
 
+  const slider = document.getElementById('tickSlider');
+  slider.max = String(TICK_COUNT - 1);
+  if (currentTick > TICK_COUNT - 1) {
+    currentTick = TICK_COUNT - 1;
+  }
+
   const log = LOGS[currentTick];
   AGENTS.filter(agent => selectedAgents.has(agent.key)).forEach(agent => {
     drawTree(document.getElementById(`tree-${agent.key}`), agent.tree, log.agentStatus[agent.key]);
     drawTimeline(agent, document.getElementById(`timeline-${agent.key}`), log.agentStatus[agent.key]);
   });
 
-  document.getElementById('tickSlider').value = currentTick;
+  slider.value = String(currentTick);
   document.getElementById('tickDisplay').textContent = 'tick ' + currentTick;
   requestAnimationFrame(updateSharedTickOverlay);
 }
