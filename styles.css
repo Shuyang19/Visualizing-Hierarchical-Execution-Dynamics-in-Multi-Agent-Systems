@@ -21,7 +21,7 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .subtitle { font-size: 13px; color: #5F5E5A; margin-bottom: 20px; }
 
 .page-shell {
-  max-width: 1380px;
+  width: min(96vw, 1820px);
   margin: 0 auto;
   position: relative;
 }
@@ -69,7 +69,7 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 
 .viz-layout {
   display: grid;
-  grid-template-columns: minmax(360px, 0.95fr) minmax(520px, 1.35fr);
+  grid-template-columns: minmax(520px, 1.1fr) minmax(760px, 1.3fr);
   gap: 16px;
   align-items: stretch;
 }
@@ -84,7 +84,7 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .agent-row {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(360px, 0.95fr) minmax(520px, 1.35fr);
+  grid-template-columns: minmax(520px, 1.1fr) minmax(760px, 1.3fr);
   gap: 16px;
 }
 
@@ -108,7 +108,7 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .tree-card svg {
   flex: 1;
   width: 100%;
-  min-height: 240px;
+  min-height: 320px;
 }
 .agent-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .dot-a { background: #1D9E75; }
@@ -127,7 +127,7 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .timeline-agent-card svg {
   width: 100%;
   flex: 1;
-  min-height: 180px;
+  min-height: 220px;
 }
 .timeline-agent-card .tree-title {
   margin-bottom: 8px;
@@ -167,6 +167,29 @@ button:hover { background: #e8e7e3; }
   pointer-events: none;
   z-index: 5;
 }
+.shared-tick-dim {
+  position: absolute;
+  display: none;
+  background: rgba(255, 255, 255, 0.56);
+  backdrop-filter: blur(2px);
+}
+.shared-tick-focus {
+  position: absolute;
+  display: none;
+  border: 2px dashed rgba(93, 170, 165, 0.8);
+  border-radius: 28px;
+  pointer-events: auto;
+  cursor: grab;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.32) inset;
+}
+.shared-tick-focus:active {
+  cursor: grabbing;
+}
 .shared-tick-line {
   position: absolute;
   width: 0;
@@ -193,7 +216,7 @@ button:hover { background: #e8e7e3; }
   }
 
   .tree-card svg {
-    min-height: 220px;
+    min-height: 240px;
   }
 
   .timeline-agent-card svg {
@@ -207,5 +230,20 @@ button:hover { background: #e8e7e3; }
   .selector-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .shared-tick-dim {
+    background: rgba(20, 20, 18, 0.58);
+  }
+
+  .shared-tick-focus {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
   }
 }

@@ -3,6 +3,7 @@ const DARK = matchMedia('(prefers-color-scheme: dark)').matches;
 
 let currentTick = 0;
 let playing = true;
+let draggingFocus = false;
 
 const AGENTS = AGENT_DEFINITIONS.map(agent => ({
   ...agent,
@@ -37,9 +38,9 @@ const STATUS_RING = {
 const TREE_LAYOUT = {
   levelGap: 68,
   siblingGap: 14,
-  sidePad: 18,
-  topPad: 18,
-  bottomPad: 24,
+  sidePad: 8,
+  topPad: 10,
+  bottomPad: 12,
   charWidth: 4.9
 };
 
@@ -259,21 +260,21 @@ function drawTree(svgEl, root, statusMap) {
     svgEl.appendChild(g);
   });
 
-  const minX = Math.min(...nodes.map(node => node._x - node._boxW / 2 - 8));
-  const maxX = Math.max(...nodes.map(node => node._x + node._boxW / 2 + 8));
-  const minY = Math.min(...nodes.map(node => node._y - node._boxH / 2 - 8));
-  const maxY = Math.max(...nodes.map(node => node._y + node._boxH / 2 + 18));
+  const minX = Math.min(...nodes.map(node => node._x - node._boxW / 2 - 4));
+  const maxX = Math.max(...nodes.map(node => node._x + node._boxW / 2 + 4));
+  const minY = Math.min(...nodes.map(node => node._y - node._boxH / 2 - 4));
+  const maxY = Math.max(...nodes.map(node => node._y + node._boxH / 2 + 12));
   const viewW = Math.ceil(maxX - minX + TREE_LAYOUT.sidePad * 2);
   const viewH = Math.ceil(maxY - minY + TREE_LAYOUT.bottomPad);
-  svgEl.setAttribute('viewBox', `${Math.floor(minX - TREE_LAYOUT.sidePad)} ${Math.floor(minY - 4)} ${viewW} ${viewH}`);
+  svgEl.setAttribute('viewBox', `${Math.floor(minX - TREE_LAYOUT.sidePad)} ${Math.floor(minY - 2)} ${viewW} ${viewH}`);
 }
 
 function drawTimeline(agent, svgEl, statusMap) {
   svgEl.innerHTML = '';
   const ns = 'http://www.w3.org/2000/svg';
-  const PAD_L = 84;
-  const PAD_R = 12;
-  const PAD_T = 28;
+  const PAD_L = 72;
+  const PAD_R = 8;
+  const PAD_T = 24;
   const TITLE_Y = 12;
   const TICK_Y = PAD_T + 9;
   const ROW_H = 18;
@@ -282,6 +283,15 @@ function drawTimeline(agent, svgEl, statusMap) {
   const usableW = SVG_W - PAD_L - PAD_R;
   const cellW = usableW / TICK_COUNT;
   const totalH = PAD_T + 18 + agent.rows.length * (ROW_H + GAP);
+  const gridTop = PAD_T + 18;
+  const gridBottom = PAD_T + 18 + (agent.rows.length - 1) * (ROW_H + GAP) + ROW_H;
+
+  function getCellOpacity(tickIndex) {
+    const dist = Math.abs(tickIndex - currentTick);
+    if (dist <= 2) return 1;
+    if (dist <= 4) return 0.48;
+    return 0.18;
+  }
 
   function addText(x, y, content, size, fill, anchor) {
     const t = document.createElementNS(ns, 'text');
@@ -339,28 +349,63 @@ function drawTimeline(agent, svgEl, statusMap) {
       cell.setAttribute('height', ROW_H - 4);
       cell.setAttribute('rx', 2);
       cell.setAttribute('fill', fill);
+      cell.setAttribute('opacity', String(getCellOpacity(ti)));
       svgEl.appendChild(cell);
     });
   });
 
   svgEl.dataset.tickX = String(PAD_L + currentTick * cellW + cellW / 2);
-  svgEl.dataset.tickTop = String(PAD_T);
-  svgEl.dataset.tickBottom = String(totalH);
+  svgEl.dataset.tickTop = String(gridTop);
+  svgEl.dataset.tickBottom = String(gridBottom);
+  svgEl.dataset.focusLeft = String(PAD_L);
+  svgEl.dataset.focusRight = String(PAD_L + usableW);
   svgEl.dataset.viewBoxWidth = String(SVG_W);
   svgEl.dataset.viewBoxHeight = String(totalH + 10);
   svgEl.setAttribute('viewBox', `0 0 680 ${totalH + 10}`);
+}
+
+function getVisibleTimelineSvgs() {
+  return AGENTS
+    .filter(agent => selectedAgents.has(agent.key))
+    .map(agent => document.getElementById(`timeline-${agent.key}`))
+    .filter(Boolean);
+}
+
+function updateTickFromClientX(clientX) {
+  const shell = document.querySelector('.page-shell');
+  const timelineSvgs = getVisibleTimelineSvgs();
+  if (!shell || !timelineSvgs.length) return;
+
+  const firstSvg = timelineSvgs[0];
+  const shellRect = shell.getBoundingClientRect();
+  const firstRect = firstSvg.getBoundingClientRect();
+  const viewBoxWidth = Number(firstSvg.dataset.viewBoxWidth);
+  const focusLeftData = Number(firstSvg.dataset.focusLeft);
+  const focusRightData = Number(firstSvg.dataset.focusRight);
+  if (!firstRect.width || !viewBoxWidth) return;
+
+  const gridLeft = firstRect.left - shellRect.left + (focusLeftData / viewBoxWidth) * firstRect.width;
+  const gridRight = firstRect.left - shellRect.left + (focusRightData / viewBoxWidth) * firstRect.width;
+  const clampedX = Math.min(Math.max(clientX - shellRect.left, gridLeft), gridRight);
+  const ratio = (clampedX - gridLeft) / Math.max(1, gridRight - gridLeft);
+  const nextTick = Math.round(ratio * Math.max(0, TICK_COUNT - 1));
+
+  if (nextTick !== currentTick) {
+    currentTick = nextTick;
+    render();
+  }
 }
 
 function updateSharedTickOverlay() {
   const shell = document.querySelector('.page-shell');
   const line = document.getElementById('sharedTickLine');
   const label = document.getElementById('sharedTickLabel');
-  const timelineSvgs = AGENTS
-    .filter(agent => selectedAgents.has(agent.key))
-    .map(agent => document.getElementById(`timeline-${agent.key}`))
-    .filter(Boolean);
+  const focus = document.getElementById('sharedTickFocus');
+  const dimLeft = document.getElementById('sharedTickDimLeft');
+  const dimRight = document.getElementById('sharedTickDimRight');
+  const timelineSvgs = getVisibleTimelineSvgs();
 
-  if (!shell || !line || !label || !timelineSvgs.length) return;
+  if (!shell || !line || !label || !focus || !dimLeft || !dimRight || !timelineSvgs.length) return;
 
   const firstSvg = timelineSvgs[0];
   const lastSvg = timelineSvgs[timelineSvgs.length - 1];
@@ -372,6 +417,8 @@ function updateSharedTickOverlay() {
   const tickX = Number(firstSvg.dataset.tickX);
   const tickTop = Number(firstSvg.dataset.tickTop);
   const tickBottom = Number(lastSvg.dataset.tickBottom);
+  const focusLeftData = Number(firstSvg.dataset.focusLeft);
+  const focusRightData = Number(firstSvg.dataset.focusRight);
   const viewBoxWidth = Number(firstSvg.dataset.viewBoxWidth);
   const firstViewBoxHeight = Number(firstSvg.dataset.viewBoxHeight);
   const lastViewBoxHeight = Number(lastSvg.dataset.viewBoxHeight);
@@ -379,16 +426,49 @@ function updateSharedTickOverlay() {
   const x = firstRect.left - shellRect.left + (tickX / viewBoxWidth) * firstRect.width;
   const yTop = firstRect.top - shellRect.top + (tickTop / firstViewBoxHeight) * firstRect.height;
   const yBottom = lastRect.top - shellRect.top + (tickBottom / lastViewBoxHeight) * lastRect.height;
+  const focusWidth = Math.max(82, firstRect.width * 0.16);
+  const timelineLeft = firstRect.left - shellRect.left + (focusLeftData / viewBoxWidth) * firstRect.width;
+  const timelineRight = firstRect.left - shellRect.left + (focusRightData / viewBoxWidth) * firstRect.width;
+  const focusLeft = Math.max(timelineLeft, x - focusWidth / 2);
+  const focusRight = Math.min(timelineRight, x + focusWidth / 2);
+  const focusTop = yTop - 38;
+  const focusHeight = Math.max(0, yBottom - yTop + 36);
 
   line.style.display = 'block';
   line.style.left = `${x}px`;
   line.style.top = `${yTop}px`;
   line.style.height = `${Math.max(0, yBottom - yTop)}px`;
 
+  focus.style.display = 'block';
+  focus.style.left = `${focusLeft}px`;
+  focus.style.top = `${focusTop}px`;
+  focus.style.width = `${Math.max(0, focusRight - focusLeft)}px`;
+  focus.style.height = `${focusHeight}px`;
+
+  dimLeft.style.display = 'none';
+  dimRight.style.display = 'none';
+
   label.style.display = 'block';
   label.style.left = `${x + 8}px`;
-  label.style.top = `${Math.max(0, yTop - 18)}px`;
+  label.style.top = `${Math.max(0, focusTop - 18)}px`;
   label.textContent = `tick ${currentTick}`;
+}
+
+function startFocusDrag(event) {
+  event.preventDefault();
+  draggingFocus = true;
+  playing = false;
+  document.getElementById('playBtn').textContent = '▶ Play';
+  updateTickFromClientX(event.clientX);
+}
+
+function onFocusDrag(event) {
+  if (!draggingFocus) return;
+  updateTickFromClientX(event.clientX);
+}
+
+function endFocusDrag() {
+  draggingFocus = false;
 }
 
 function render() {
@@ -431,6 +511,11 @@ setInterval(() => {
 addEventListener('resize', () => {
   requestAnimationFrame(updateSharedTickOverlay);
 });
+
+document.getElementById('sharedTickFocus').addEventListener('pointerdown', startFocusDrag);
+addEventListener('pointermove', onFocusDrag);
+addEventListener('pointerup', endFocusDrag);
+addEventListener('pointercancel', endFocusDrag);
 
 buildAgentSelector();
 render();
