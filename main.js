@@ -102,6 +102,86 @@ function allNodes(root) {
   return [root, ...(root.children || []).flatMap(allNodes)];
 }
 
+function formatStatus(status) {
+  if (status === null || status === undefined) return 'idle';
+  return status;
+}
+
+function getStatusRun(agentKey, nodeId, tick) {
+  const currentStatus = LOGS[tick].agentStatus[agentKey][nodeId] ?? null;
+  let start = tick;
+  let end = tick;
+
+  while (start > 0) {
+    const prevStatus = LOGS[start - 1].agentStatus[agentKey][nodeId] ?? null;
+    if (prevStatus !== currentStatus) break;
+    start -= 1;
+  }
+
+  while (end < TICK_COUNT - 1) {
+    const nextStatus = LOGS[end + 1].agentStatus[agentKey][nodeId] ?? null;
+    if (nextStatus !== currentStatus) break;
+    end += 1;
+  }
+
+  return {
+    status: currentStatus,
+    start,
+    end,
+    duration: end - start + 1
+  };
+}
+
+function getNodeTooltipContent(agent, node) {
+  const run = getStatusRun(agent.key, node.id, currentTick);
+  const rangeText = run.duration > 1 ? `ticks ${run.start}-${run.end}` : `tick ${run.start}`;
+  return `
+    <strong>${node.label}</strong>
+    <div class="tooltip-meta">${agent.title}</div>
+    <div>Type: ${node.type}</div>
+    <div>Status: ${formatStatus(run.status)}</div>
+    <div>Duration: ${run.duration} tick${run.duration === 1 ? '' : 's'} (${rangeText})</div>
+  `;
+}
+
+function positionNodeTooltip(event) {
+  const tooltip = document.getElementById('nodeTooltip');
+  if (!tooltip || tooltip.hidden) return;
+
+  const gap = 14;
+  const rect = tooltip.getBoundingClientRect();
+  let left = event.clientX + gap;
+  let top = event.clientY + gap;
+
+  if (left + rect.width > window.innerWidth - 10) {
+    left = event.clientX - rect.width - gap;
+  }
+  if (top + rect.height > window.innerHeight - 10) {
+    top = event.clientY - rect.height - gap;
+  }
+
+  tooltip.style.left = `${Math.max(10, left)}px`;
+  tooltip.style.top = `${Math.max(10, top)}px`;
+}
+
+function showNodeTooltip(event, agent, node) {
+  const tooltip = document.getElementById('nodeTooltip');
+  if (!tooltip) return;
+  tooltip.innerHTML = getNodeTooltipContent(agent, node);
+  tooltip.hidden = false;
+  tooltip.style.opacity = '1';
+  tooltip.style.transform = 'translateY(0)';
+  positionNodeTooltip(event);
+}
+
+function hideNodeTooltip() {
+  const tooltip = document.getElementById('nodeTooltip');
+  if (!tooltip) return;
+  tooltip.style.opacity = '0';
+  tooltip.style.transform = 'translateY(8px)';
+  tooltip.hidden = true;
+}
+
 AGENTS.forEach(agent => prepareTreeLayout(agent.tree));
 
 function buildAgentSelector() {
@@ -177,7 +257,7 @@ function buildAgentRows() {
   });
 }
 
-function drawTree(svgEl, root, statusMap) {
+function drawTree(svgEl, agent, root, statusMap) {
   svgEl.innerHTML = '';
   const ns = 'http://www.w3.org/2000/svg';
   const nodes = allNodes(root);
@@ -256,6 +336,11 @@ function drawTree(svgEl, root, statusMap) {
     badge.setAttribute('fill', DARK ? '#888780' : '#b4b2a9');
     badge.textContent = node.type;
     g.appendChild(badge);
+
+    g.style.cursor = 'default';
+    g.addEventListener('mouseenter', event => showNodeTooltip(event, agent, node));
+    g.addEventListener('mousemove', positionNodeTooltip);
+    g.addEventListener('mouseleave', hideNodeTooltip);
 
     svgEl.appendChild(g);
   });
@@ -472,6 +557,7 @@ function endFocusDrag() {
 }
 
 function render() {
+  hideNodeTooltip();
   buildLegend();
   buildAgentRows();
 
@@ -483,7 +569,7 @@ function render() {
 
   const log = LOGS[currentTick];
   AGENTS.filter(agent => selectedAgents.has(agent.key)).forEach(agent => {
-    drawTree(document.getElementById(`tree-${agent.key}`), agent.tree, log.agentStatus[agent.key]);
+    drawTree(document.getElementById(`tree-${agent.key}`), agent, agent.tree, log.agentStatus[agent.key]);
     drawTimeline(agent, document.getElementById(`timeline-${agent.key}`), log.agentStatus[agent.key]);
   });
 
@@ -511,6 +597,8 @@ setInterval(() => {
 addEventListener('resize', () => {
   requestAnimationFrame(updateSharedTickOverlay);
 });
+
+addEventListener('scroll', hideNodeTooltip, { passive: true });
 
 document.getElementById('sharedTickFocus').addEventListener('pointerdown', startFocusDrag);
 addEventListener('pointermove', onFocusDrag);
