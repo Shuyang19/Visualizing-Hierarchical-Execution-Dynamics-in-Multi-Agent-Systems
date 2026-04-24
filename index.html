@@ -8,8 +8,34 @@
 </head>
 <body>
   <div class="page-shell">
-    <h1>Multi-Agent Behavior Tree Visualization</h1>
-    <p class="subtitle">Real-time hierarchical execution dynamics — Georgia Institute of Technology</p>
+    <div class="page-header">
+      <h1>Multi-Agent Behavior Tree Visualization</h1>
+      <p class="subtitle">Real-time hierarchical execution dynamics — Georgia Institute of Technology</p>
+
+      <div class="selector-card">
+        <div class="selector-main">
+          <div class="selector-panel">
+            <div class="selector-header">
+              <div class="section-label">Visible agents</div>
+              <div class="selector-hint">Select one or more agents to compare</div>
+            </div>
+            <div class="agent-selector" id="agentSelector"></div>
+          </div>
+
+          <div class="timeline-footer">
+            <div class="legend" id="legend"></div>
+            <div class="controls">
+              <label>Tick</label>
+              <input type="range" id="tickSlider" min="0" max="0" value="0" step="1"
+                oninput="onSlider(this.value)">
+              <span class="tick-display" id="tickDisplay">tick 0</span>
+              <button id="playBtn" onclick="togglePlay()">⏸ Pause</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="timeline-overlay" aria-hidden="true">
       <div class="shared-tick-dim shared-tick-dim-left" id="sharedTickDimLeft"></div>
       <div class="shared-tick-dim shared-tick-dim-right" id="sharedTickDimRight"></div>
@@ -18,29 +44,10 @@
       <div class="shared-tick-label" id="sharedTickLabel">tick 0</div>
     </div>
 
-    <div class="selector-card">
-      <div class="selector-header">
-        <div class="section-label">Visible agents</div>
-        <div class="selector-hint">Select one or more agents to compare</div>
-      </div>
-      <div class="agent-selector" id="agentSelector"></div>
-    </div>
-
     <div class="viz-layout">
       <div class="section-label">Behavior trees</div>
       <div class="section-label">Execution timeline</div>
       <div id="agentRows"></div>
-
-      <div class="timeline-footer">
-        <div class="legend" id="legend"></div>
-        <div class="controls">
-          <label>Tick</label>
-          <input type="range" id="tickSlider" min="0" max="0" value="0" step="1"
-            oninput="onSlider(this.value)">
-          <span class="tick-display" id="tickDisplay">tick 0</span>
-          <button id="playBtn" onclick="togglePlay()">⏸ Pause</button>
-        </div>
-      </div>
     </div>
   </div>
 
