@@ -1,0 +1,14 @@
+# Nibbles Guided Evolution Params
+PARAMS = {
+    'OPEN_SPACE_WEIGHT': 0.6867,
+    'CORNER_BONUS': 3.0,
+    'EGG_BONUS': 1.5,
+    'PARITY_BONUS': 0.5,
+    'CENTER_BONUS': 0.2,
+    'TRAP_PENALTY': 236.9372,
+    'ENEMY_TURD_PENALTY': 0.7967,
+    'VISIT_PENALTY': 4.3162,
+    'CHASE_WEIGHT': 0.1,
+    'TURD_OFFENSE_BONUS': 3.0,
+    'TURD_BLOCK_BONUS': 4.8357,
+}

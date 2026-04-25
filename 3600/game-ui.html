@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3600 Game Interface Mockup</title>
+  <style>
+    :root {
+      --bg-top: #f3ecd8;
+      --bg-bottom: #dbe7ef;
+      --panel: rgba(255, 251, 241, 0.88);
+      --panel-strong: #fffaf0;
+      --panel-border: rgba(95, 78, 44, 0.16);
+      --text: #1f2a2d;
+      --muted: #67757a;
+      --board-frame: #4d3426;
+      --board-edge: #7a563e;
+      --cell-light: #efe4bf;
+      --cell-dark: #dfc98f;
+      --grid-line: rgba(73, 45, 18, 0.18);
+      --accent-a: #1d9e75;
+      --accent-a-soft: #d9f4ea;
+      --accent-b: #534ab7;
+      --accent-b-soft: #e6e2fb;
+      --turd-a: #8b5e34;
+      --turd-b: #5b4a92;
+      --trapdoor: #47392d;
+      --shadow-lg: 0 26px 60px rgba(65, 51, 33, 0.18);
+      --shadow-md: 0 12px 28px rgba(65, 51, 33, 0.14);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(83, 74, 183, 0.08), transparent 32%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.25;
+    }
+
+    .page {
+      width: min(1420px, calc(100vw - 32px));
+      margin: 24px auto;
+      padding: 24px;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.34);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      pointer-events: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 16px;
+      animation: rise 600ms ease-out both;
+    }
+
+    .hero-copy {
+      max-width: 760px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 250, 240, 0.82);
+      border: 1px solid rgba(95, 78, 44, 0.12);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #735c35;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      box-shadow: 0 0 0 4px rgba(83, 74, 183, 0.1);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Hoefler Text", Georgia, serif;
+      font-size: clamp(34px, 4.2vw, 58px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy p {
+      margin: 12px 0 0;
+      max-width: 700px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      min-width: 0;
+      animation: rise 760ms ease-out both;
+    }
+
+    .mini-stat {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 250, 240, 0.84);
+      border: 1px solid rgba(95, 78, 44, 0.12);
+      box-shadow: var(--shadow-md);
+    }
+
+    .mini-stat .value {
+      display: block;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .mini-stat .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 280px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(14px);
+      animation: rise 720ms ease-out both;
+    }
+
+    .panel h2,
+    .board-panel h2 {
+      margin: 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .agent-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 0 16px;
+    }
+
+    .agent-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .agent-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.05);
+      flex: 0 0 auto;
+    }
+
+    .dot-a {
+      background: var(--accent-a);
+    }
+
+    .dot-b {
+      background: var(--accent-b);
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill-a {
+      background: var(--accent-a-soft);
+      color: #0f6e56;
+    }
+
+    .pill-b {
+      background: var(--accent-b-soft);
+      color: #3f3797;
+    }
+
+    .stat-list {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(95, 78, 44, 0.09);
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stat-card .subvalue {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .sensor-box,
+    .intel-box,
+    .move-box {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(95, 78, 44, 0.09);
+      margin-top: 14px;
+    }
+
+    .sensor-box h3,
+    .intel-box h3,
+    .move-box h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .sensor-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.7);
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .signal {
+      font-weight: 700;
+      color: #805725;
+    }
+
+    .board-panel {
+      background: var(--panel-strong);
+      border: 1px solid var(--panel-border);
+      border-radius: 32px;
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      animation: rise 680ms ease-out both;
+    }
+
+    .board-panel::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 24px;
+      border: 1px solid rgba(95, 78, 44, 0.08);
+      pointer-events: none;
+    }
+
+    .board-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .board-topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .turn-ribbon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(29, 158, 117, 0.12), rgba(83, 74, 183, 0.12));
+      border: 1px solid rgba(83, 74, 183, 0.14);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .board-wrap {
+      position: relative;
+      z-index: 1;
+      margin: 0 auto;
+      max-width: 760px;
+    }
+
+    .board-shell {
+      position: relative;
+      padding: 18px 18px 18px 44px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, var(--board-edge), var(--board-frame));
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12), 0 24px 40px rgba(55, 38, 23, 0.28);
+    }
+
+    .col-labels {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+      margin: 0 0 8px;
+      padding-left: 2px;
+      color: rgba(255, 249, 235, 0.8);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      text-align: center;
+    }
+
+    .row-labels {
+      position: absolute;
+      inset: 44px auto 18px 14px;
+      display: grid;
+      grid-template-rows: repeat(8, 1fr);
+      gap: 8px;
+      width: 18px;
+      color: rgba(255, 249, 235, 0.8);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      text-align: center;
+      align-items: center;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(54px, 1fr));
+      gap: 8px;
+      aspect-ratio: 1 / 1;
+    }
+
+    .cell {
+      position: relative;
+      border-radius: 18px;
+      border: 1px solid var(--grid-line);
+      overflow: hidden;
+      min-height: 54px;
+      animation: cell-rise 500ms ease-out both;
+      animation-delay: var(--delay);
+    }
+
+    .cell.light {
+      background: linear-gradient(180deg, #f7ecc8, var(--cell-light));
+    }
+
+    .cell.dark {
+      background: linear-gradient(180deg, #ebd59e, var(--cell-dark));
+    }
+
+    .cell::after {
+      content: attr(data-coord);
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(54, 38, 19, 0.42);
+      pointer-events: none;
+    }
+
+    .terrain {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+    }
+
+    .terrain.spawn-a {
+      box-shadow: inset 0 0 0 3px rgba(29, 158, 117, 0.26);
+    }
+
+    .terrain.spawn-b {
+      box-shadow: inset 0 0 0 3px rgba(83, 74, 183, 0.22);
+    }
+
+    .terrain.trapdoor {
+      inset: 9px;
+      border-radius: 12px;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.12) 0,
+          rgba(255, 255, 255, 0.12) 6px,
+          transparent 6px,
+          transparent 12px
+        ),
+        linear-gradient(180deg, #5e4a3b, #30231c);
+      border: 1px solid rgba(255, 244, 220, 0.15);
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .terrain.hint-ring {
+      inset: 7px;
+      border-radius: 14px;
+      border: 2px dashed rgba(192, 93, 18, 0.5);
+      background: rgba(255, 179, 71, 0.08);
+    }
+
+    .piece {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .egg {
+      width: 20px;
+      height: 26px;
+      border-radius: 50% 50% 46% 46%;
+      box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.14);
+    }
+
+    .egg-a {
+      background: radial-gradient(circle at 35% 30%, #f8fffc, #9ee3cc 65%, #4ab796 100%);
+    }
+
+    .egg-b {
+      background: radial-gradient(circle at 35% 30%, #f7f7ff, #beb8f6 64%, #665fd0 100%);
+    }
+
+    .turd {
+      width: 24px;
+      height: 24px;
+      border-radius: 50% 50% 40% 40%;
+      box-shadow:
+        inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+        0 6px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .turd::before,
+    .turd::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 999px;
+    }
+
+    .turd::before {
+      width: 18px;
+      height: 10px;
+      bottom: 15px;
+      background: inherit;
+    }
+
+    .turd::after {
+      width: 10px;
+      height: 8px;
+      bottom: 22px;
+      background: inherit;
+    }
+
+    .turd-a {
+      background: linear-gradient(180deg, #ab7a47, var(--turd-a));
+    }
+
+    .turd-b {
+      background: linear-gradient(180deg, #7e71d8, var(--turd-b));
+    }
+
+    .chicken {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      animation: float 2600ms ease-in-out infinite;
+      box-shadow: 0 10px 16px rgba(0, 0, 0, 0.16);
+      z-index: 2;
+    }
+
+    .chicken::before {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: 12px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 8px solid #f09a29;
+    }
+
+    .chicken::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      left: 7px;
+      top: 7px;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+    }
+
+    .chicken-a {
+      background: radial-gradient(circle at 35% 35%, #f3fffb, #8ce0c2 64%, var(--accent-a));
+      border: 3px solid rgba(15, 110, 86, 0.22);
+    }
+
+    .chicken-b {
+      background: radial-gradient(circle at 35% 35%, #faf9ff, #b6b0f6 64%, var(--accent-b));
+      border: 3px solid rgba(63, 55, 151, 0.22);
+      animation-delay: 320ms;
+    }
+
+    .board-footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .note-card,
+    .legend-card {
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(95, 78, 44, 0.1);
+    }
+
+    .note-card h3,
+    .legend-card h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .note-item {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255, 250, 240, 0.82);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .note-item strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .legend-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .legend-swatch {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+    }
+
+    .legend-swatch .piece,
+    .legend-swatch .terrain {
+      transform: none;
+      left: auto;
+      top: auto;
+    }
+
+    .legend-swatch .piece {
+      position: relative;
+      display: block;
+      margin: 2px auto 0;
+    }
+
+    .legend-swatch .terrain {
+      position: absolute;
+      inset: 2px;
+    }
+
+    .legend-swatch .egg {
+      margin-top: 2px;
+    }
+
+    .legend-swatch .turd {
+      margin-top: 6px;
+    }
+
+    .legend-swatch .chicken {
+      margin-top: 1px;
+    }
+
+    .footer-strip {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+      animation: rise 860ms ease-out both;
+    }
+
+    .footer-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-tag {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255, 250, 240, 0.82);
+      border: 1px solid rgba(95, 78, 44, 0.12);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes cell-rise {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes float {
+      0%,
+      100% {
+        transform: translate(-50%, -50%);
+      }
+      50% {
+        transform: translate(-50%, calc(-50% - 3px));
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .board-panel {
+        order: -1;
+      }
+
+      .board-footer {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: calc(100vw - 16px);
+        margin: 8px auto;
+        padding: 16px;
+        border-radius: 24px;
+      }
+
+      .board-shell {
+        padding: 14px 14px 14px 36px;
+      }
+
+      .board {
+        gap: 6px;
+      }
+
+      .cell {
+        min-height: 38px;
+        border-radius: 12px;
+      }
+
+      .egg {
+        width: 15px;
+        height: 20px;
+      }
+
+      .turd {
+        width: 18px;
+        height: 18px;
+      }
+
+      .chicken {
+        width: 22px;
+        height: 22px;
+      }
+
+      .note-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">3600 hidden-trapdoor duel</div>
+        <h1>Game Interface Visualization</h1>
+        <p>
+          A polished board snapshot for the chicken-vs-chicken strategy game: eggs score,
+          turds control space, and trapdoors turn each move into an imperfect-information gamble.
+        </p>
+      </div>
+
+      <div class="hero-stats">
+        <div class="mini-stat">
+          <span class="value">8x8</span>
+          <span class="label">Board</span>
+        </div>
+        <div class="mini-stat">
+          <span class="value">40</span>
+          <span class="label">Moves each</span>
+        </div>
+        <div class="mini-stat">
+          <span class="value">1</span>
+          <span class="label">Trapdoor parity</span>
+        </div>
+        <div class="mini-stat">
+          <span class="value">5</span>
+          <span class="label">Turds max</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-grid">
+      <aside class="panel">
+        <h2>Player A</h2>
+        <div class="agent-title">
+          <div>
+            <div class="agent-name"><span class="dot dot-a"></span>Fuzzby</div>
+            <div class="agent-subtitle">Expansion-first heuristic agent with parity awareness.</div>
+          </div>
+          <div class="pill pill-a">active turn</div>
+        </div>
+
+        <div class="stat-list">
+          <div class="stat-card">
+            <div class="label">Score</div>
+            <div class="value">12</div>
+            <div class="subvalue">Egg-led advantage with corner bonus pressure.</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Resources</div>
+            <div class="value">3</div>
+            <div class="subvalue">Turds left, 16 moves remaining, parity aligned.</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Time bank</div>
+            <div class="value">359.97s</div>
+            <div class="subvalue">Move selected: RIGHT + EGG.</div>
+          </div>
+        </div>
+
+        <div class="sensor-box">
+          <h3>Sensor feed</h3>
+          <div class="sensor-chip">
+            <span>Hear near D4</span>
+            <span class="signal">weak ping</span>
+          </div>
+          <div class="sensor-chip">
+            <span>Feel near D4</span>
+            <span class="signal">none</span>
+          </div>
+          <div class="sensor-chip">
+            <span>Board pressure</span>
+            <span class="signal">enemy close</span>
+          </div>
+        </div>
+
+        <div class="move-box">
+          <h3>Why this move</h3>
+          <div class="agent-subtitle">
+            Secure a center lane egg, keep distance from the enemy turd wall, and preserve one
+            diagonal escape route in case the hidden trapdoor sits on even parity.
+          </div>
+        </div>
+      </aside>
+
+      <section class="board-panel">
+        <div class="board-topbar">
+          <div>
+            <h2>Board snapshot</h2>
+            <p>Turn 24, post-sensor evaluation. Discovered hazards are visible, hidden ones are inferred.</p>
+          </div>
+          <div class="turn-ribbon">Fuzzby to move at C6</div>
+        </div>
+
+        <div class="board-wrap">
+          <div class="board-shell">
+            <div class="col-labels">
+              <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span>
+            </div>
+            <div class="row-labels">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+            </div>
+            <div class="board" id="board"></div>
+          </div>
+        </div>
+
+        <div class="board-footer">
+          <div class="note-card">
+            <h3>Snapshot notes</h3>
+            <div class="note-grid">
+              <div class="note-item">
+                <strong>Scoring lane</strong>
+                Green eggs dominate the lower-left arc, building toward a blocking finish if purple gets squeezed.
+              </div>
+              <div class="note-item">
+                <strong>Trapdoor story</strong>
+                One trapdoor has already been revealed at D4. Another is only hinted by sound feedback.
+              </div>
+              <div class="note-item">
+                <strong>Turd control</strong>
+                Brown and violet turds create local no-go zones, forcing detours and breaking easy chases.
+              </div>
+              <div class="note-item">
+                <strong>Interface goal</strong>
+                Show all major game objects on one page: players, eggs, turds, discovered hazards, sensors, and score state.
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-card">
+            <h3>Legend</h3>
+            <div class="legend-list">
+              <div class="legend-row">
+                <div class="legend-swatch"><span class="piece chicken chicken-a"></span></div>
+                <span>Player A chicken</span>
+              </div>
+              <div class="legend-row">
+                <div class="legend-swatch"><span class="piece chicken chicken-b"></span></div>
+                <span>Player B chicken</span>
+              </div>
+              <div class="legend-row">
+                <div class="legend-swatch"><span class="piece egg egg-a"></span></div>
+                <span>Green egg, contributes to score</span>
+              </div>
+              <div class="legend-row">
+                <div class="legend-swatch"><span class="piece turd turd-a"></span></div>
+                <span>Turd, creates local movement pressure</span>
+              </div>
+              <div class="legend-row">
+                <div class="legend-swatch"><span class="terrain trapdoor"></span></div>
+                <span>Discovered trapdoor</span>
+              </div>
+              <div class="legend-row">
+                <div class="legend-swatch"><span class="terrain hint-ring"></span></div>
+                <span>Suspected trapdoor zone from hear/feel hints</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Player B</h2>
+        <div class="agent-title">
+          <div>
+            <div class="agent-name"><span class="dot dot-b"></span>Gary</div>
+            <div class="agent-subtitle">Territory evaluator, leaning on defensive spacing.</div>
+          </div>
+          <div class="pill pill-b">under pressure</div>
+        </div>
+
+        <div class="stat-list">
+          <div class="stat-card">
+            <div class="label">Score</div>
+            <div class="value">10</div>
+            <div class="subvalue">Still alive, but ceding center tempo.</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Resources</div>
+            <div class="value">2</div>
+            <div class="subvalue">Turds left, 16 moves remaining, center route narrowed.</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Time bank</div>
+            <div class="value">359.98s</div>
+            <div class="subvalue">Last move: LEFT + PLAIN.</div>
+          </div>
+        </div>
+
+        <div class="intel-box">
+          <h3>Threat map</h3>
+          <div class="sensor-chip">
+            <span>Corner access</span>
+            <span class="signal">contested</span>
+          </div>
+          <div class="sensor-chip">
+            <span>Safe retreat</span>
+            <span class="signal">two lanes</span>
+          </div>
+          <div class="sensor-chip">
+            <span>Blocking risk</span>
+            <span class="signal">rising</span>
+          </div>
+        </div>
+
+        <div class="move-box">
+          <h3>State summary</h3>
+          <div class="agent-subtitle">
+            Purple still has reachable scoring cells, but the center is increasingly shaped by Fuzzby's eggs and a
+            discovered trapdoor that trims the safest route back toward the left flank.
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer-strip">
+      <div>
+        This page is a visual mockup for the 3600 game interface, designed as a clean reference scene rather than a live engine replay.
+      </div>
+      <div class="footer-tags">
+        <span class="footer-tag">Move types: plain / egg / turd</span>
+        <span class="footer-tag">Win states: eggs laid / blocking / timeout</span>
+        <span class="footer-tag">Trapdoors use noisy hear and feel signals</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const snapshot = {
+      players: [
+        { kind: 'chicken', variant: 'a', x: 2, y: 5 },
+        { kind: 'chicken', variant: 'b', x: 5, y: 2 }
+      ],
+      eggs: [
+        { kind: 'egg', variant: 'a', x: 0, y: 0 },
+        { kind: 'egg', variant: 'a', x: 1, y: 0 },
+        { kind: 'egg', variant: 'a', x: 1, y: 1 },
+        { kind: 'egg', variant: 'a', x: 2, y: 1 },
+        { kind: 'egg', variant: 'a', x: 2, y: 2 },
+        { kind: 'egg', variant: 'a', x: 3, y: 4 },
+        { kind: 'egg', variant: 'a', x: 1, y: 5 },
+        { kind: 'egg', variant: 'a', x: 2, y: 6 },
+        { kind: 'egg', variant: 'b', x: 7, y: 1 },
+        { kind: 'egg', variant: 'b', x: 6, y: 1 },
+        { kind: 'egg', variant: 'b', x: 6, y: 2 },
+        { kind: 'egg', variant: 'b', x: 5, y: 3 },
+        { kind: 'egg', variant: 'b', x: 6, y: 5 }
+      ],
+      turds: [
+        { kind: 'turd', variant: 'a', x: 4, y: 5 },
+        { kind: 'turd', variant: 'a', x: 4, y: 6 },
+        { kind: 'turd', variant: 'b', x: 5, y: 4 },
+        { kind: 'turd', variant: 'b', x: 6, y: 3 }
+      ],
+      terrain: [
+        { kind: 'spawn-a', x: 0, y: 6 },
+        { kind: 'spawn-b', x: 7, y: 6 },
+        { kind: 'trapdoor', x: 3, y: 3 },
+        { kind: 'hint-ring', x: 4, y: 3 }
+      ]
+    };
+
+    const board = document.getElementById('board');
+    const boardSize = 8;
+    const cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+    function coordLabel(x, y) {
+      return `${cols[x]}${y + 1}`;
+    }
+
+    function createPiece(item) {
+      const piece = document.createElement('span');
+      piece.className = `piece ${item.kind} ${item.kind}-${item.variant}`;
+      return piece;
+    }
+
+    function createTerrain(item) {
+      const terrain = document.createElement('span');
+      terrain.className = `terrain ${item.kind}`;
+      return terrain;
+    }
+
+    function itemsAt(x, y, list) {
+      return list.filter(item => item.x === x && item.y === y);
+    }
+
+    for (let y = 0; y < boardSize; y += 1) {
+      for (let x = 0; x < boardSize; x += 1) {
+        const cell = document.createElement('div');
+        const isLight = (x + y) % 2 === 0;
+        cell.className = `cell ${isLight ? 'light' : 'dark'}`;
+        cell.dataset.coord = coordLabel(x, y);
+        cell.style.setProperty('--delay', `${(x + y * boardSize) * 18}ms`);
+
+        itemsAt(x, y, snapshot.terrain).forEach(item => cell.appendChild(createTerrain(item)));
+        itemsAt(x, y, snapshot.eggs).forEach(item => cell.appendChild(createPiece(item)));
+        itemsAt(x, y, snapshot.turds).forEach(item => cell.appendChild(createPiece(item)));
+        itemsAt(x, y, snapshot.players).forEach(item => cell.appendChild(createPiece(item)));
+
+        board.appendChild(cell);
+      }
+    }
+  </script>
+</body>
+</html>

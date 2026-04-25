@@ -107,6 +107,15 @@ function formatStatus(status) {
   return status;
 }
 
+function formatPosition(position) {
+  if (!Array.isArray(position) || position.length !== 2) return 'n/a';
+  return `(${position[0]}, ${position[1]})`;
+}
+
+function getCurrentAgentMeta(agentKey) {
+  return LOGS[currentTick].agentMeta?.[agentKey] ?? null;
+}
+
 function getStatusRun(agentKey, nodeId, tick) {
   const currentStatus = LOGS[tick].agentStatus[agentKey][nodeId] ?? null;
   let start = tick;
@@ -135,12 +144,26 @@ function getStatusRun(agentKey, nodeId, tick) {
 function getNodeTooltipContent(agent, node) {
   const run = getStatusRun(agent.key, node.id, currentTick);
   const rangeText = run.duration > 1 ? `ticks ${run.start}-${run.end}` : `tick ${run.start}`;
+  const meta = getCurrentAgentMeta(agent.key);
+  const details = [];
+
+  if (meta?.active) {
+    details.push(`<div>Move: ${meta.moveType}</div>`);
+    details.push(`<div>Position: ${formatPosition(meta.ownPosition)}</div>`);
+    details.push(`<div>Opponent: ${formatPosition(meta.opponentPosition)}</div>`);
+    details.push(`<div>Distance: ${meta.enemyDistance}</div>`);
+    details.push(`<div>Eggs: ${meta.ownEggs} vs ${meta.opponentEggs}</div>`);
+  } else if (meta) {
+    details.push('<div>Inactive tick</div>');
+  }
+
   return `
     <strong>${node.label}</strong>
     <div class="tooltip-meta">${agent.title}</div>
     <div>Type: ${node.type}</div>
     <div>Status: ${formatStatus(run.status)}</div>
     <div>Duration: ${run.duration} tick${run.duration === 1 ? '' : 's'} (${rangeText})</div>
+    ${details.join('')}
   `;
 }
 

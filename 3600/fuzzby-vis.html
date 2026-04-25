@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3600 Agent Visualization</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div class="page-header">
+      <h1>3600 Agent Visualization</h1>
+      <p class="subtitle">Generated from Fuzzby vs Gary match history</p>
+
+      <div class="selector-card">
+        <div class="selector-main">
+          <div class="selector-panel">
+            <div class="selector-header">
+              <div class="section-label">Visible agents</div>
+              <div class="selector-hint">This page is backed by generated data from one 3600 match</div>
+            </div>
+            <div class="agent-selector" id="agentSelector"></div>
+          </div>
+
+          <div class="timeline-footer">
+            <div class="legend" id="legend"></div>
+            <div class="controls">
+              <label>Tick</label>
+              <input type="range" id="tickSlider" min="0" max="0" value="0" step="1" oninput="onSlider(this.value)">
+              <span class="tick-display" id="tickDisplay">tick 0</span>
+              <button id="playBtn" onclick="togglePlay()">⏸ Pause</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-overlay" aria-hidden="true">
+      <div class="shared-tick-dim shared-tick-dim-left" id="sharedTickDimLeft"></div>
+      <div class="shared-tick-dim shared-tick-dim-right" id="sharedTickDimRight"></div>
+      <div class="shared-tick-focus" id="sharedTickFocus"></div>
+      <div class="shared-tick-line" id="sharedTickLine"></div>
+      <div class="shared-tick-label" id="sharedTickLabel">tick 0</div>
+    </div>
+
+    <div class="viz-layout">
+      <div class="section-label">Behavior trees</div>
+      <div class="section-label">Execution timeline</div>
+      <div id="agentRows"></div>
+    </div>
+  </div>
+
+  <script src="./3600-agents/generated/Fuzzby_Gary_0.vis.js"></script>
+  <script src="../main.js"></script>
+
+  <div class="node-tooltip" id="nodeTooltip" hidden></div>
+</body>
+</html>

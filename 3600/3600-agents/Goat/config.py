@@ -1,0 +1,14 @@
+# Pawbert 进化中的参数
+PARAMS = {
+    'OPEN_SPACE_WEIGHT': 0.5327,
+    'CORNER_BONUS': 3.0,
+    'EGG_BONUS': 1.7283,
+    'PARITY_BONUS': 0.4,
+    'CENTER_BONUS': 0.2,
+    'TRAP_PENALTY': 200.0,
+    'ENEMY_TURD_PENALTY': 0.973,
+    'VISIT_PENALTY': 3.5305,
+    'CHASE_WEIGHT': 0.2,
+    'TURD_OFFENSE_BONUS': 3.0,
+    'TURD_BLOCK_BONUS': 4.366,
+}
