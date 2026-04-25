@@ -37,6 +37,12 @@ body {
     background: #242422;
     border-color: #444441;
   }
+  .dataset-select,
+  .dataset-note {
+    background: #2c2c2a;
+    border-color: #444441;
+    color: #c2c0b6;
+  }
   .selector-option {
     background: #222423;
     border-color: #444141;
@@ -77,6 +83,52 @@ h1 {
   font-size: 13px;
   color: #504f48;
   margin-bottom: 20px;
+}
+
+.dataset-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.dataset-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dataset-picker label {
+  font-size: 12px;
+  color: #5f5e5a;
+  white-space: nowrap;
+}
+
+.dataset-select {
+  min-width: 340px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0.5px solid #d3d1c7;
+  background: #fff;
+  color: #2a2a2c;
+  font: inherit;
+}
+
+.dataset-select:focus {
+  outline: 2px solid rgba(83, 74, 183, 0.18);
+  border-color: #534ab7;
+}
+
+.dataset-note {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0.5px solid #d3d1c7;
+  background: rgba(255, 255, 255, 0.75);
+  color: #5f5e5a;
+  font-size: 12px;
 }
 
 .page-shell {
@@ -379,6 +431,25 @@ button:hover {
 }
 
 @media (max-width: 980px) {
+  .dataset-bar,
+  .dataset-picker {
+    align-items: stretch;
+  }
+
+  .dataset-picker {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .dataset-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dataset-note {
+    width: 100%;
+  }
+
   .selector-main {
     grid-template-columns: 1fr;
     gap: 14px;
